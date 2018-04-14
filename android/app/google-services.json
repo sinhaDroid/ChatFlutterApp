@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "758309225388",
+    "firebase_url": "https://chit-chat-flutter-app.firebaseio.com",
+    "project_id": "chit-chat-flutter-app",
+    "storage_bucket": "chit-chat-flutter-app.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:758309225388:android:b59874fcafe9f5dc",
+        "android_client_info": {
+          "package_name": "me.sinhadroid.chitchat"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "758309225388-fkhqcv0poii34psoeqkqdqefo8f0jgev.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "me.sinhadroid.chitchat",
+            "certificate_hash": "32ae1ba618f38e20bb99137b73e7bb106eccd950"
+          }
+        },
+        {
+          "client_id": "758309225388-43qa789scs49605cemj92cs0vtdm6fku.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA04iYtirxncYsO_vG3jtI2_mwF1xKLrfY"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "758309225388-43qa789scs49605cemj92cs0vtdm6fku.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

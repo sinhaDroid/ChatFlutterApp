@@ -1,4 +1,4 @@
-package com.myfriendlychat
+package me.sinhadroid.chitchat
 
 import android.os.Bundle
 
