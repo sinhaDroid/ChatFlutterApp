@@ -57,7 +57,7 @@
 				<!-- reverse url of your client id -->
 				<string>com.googleusercontent.apps.758309225388-ssc4hl4pje4k202p4km3b2k0k2rt3hvk</string>
 				<!-- Bundle Id -->
-				<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
+				<string>me.sinhadroid.chitchat</string>
 			</array>
 		</dict>
 	</array>
