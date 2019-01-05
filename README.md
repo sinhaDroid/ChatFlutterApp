@@ -6,4 +6,4 @@
 
 ## Screenshot:
 
-<img src="https://raw.githubusercontent.com/duytq94/flutter-chat-demo/master/screenshots/FlutterChatDemo.gif" height="50%" width="50%">
+<img src="https://raw.githubusercontent.com/sinhaDroid/ChitChatApp/master/screenshots/FlutterChatDemo.gif" height="50%" width="50%">
