@@ -2,6 +2,20 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<!-- reverse url of your client id -->
+				<string>com.googleusercontent.apps.758309225388-ssc4hl4pje4k202p4km3b2k0k2rt3hvk</string>
+				<!-- Bundle Id -->
+				<string>me.sinhadroid.chitchat</string>
+			</array>
+		</dict>
+	</array>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>en</string>
 	<key>CFBundleDisplayName</key>
@@ -47,19 +61,5 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
-	<key>CFBundleURLTypes</key>
-	<array>
-		<dict>
-			<key>CFBundleTypeRole</key>
-			<string>Editor</string>
-			<key>CFBundleURLSchemes</key>
-			<array>
-				<!-- reverse url of your client id -->
-				<string>com.googleusercontent.apps.758309225388-ssc4hl4pje4k202p4km3b2k0k2rt3hvk</string>
-				<!-- Bundle Id -->
-				<string>me.sinhadroid.chitchat</string>
-			</array>
-		</dict>
-	</array>
 </dict>
 </plist>
