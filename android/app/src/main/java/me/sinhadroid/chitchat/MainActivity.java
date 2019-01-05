@@ -1,9 +1,9 @@
-package me.sinhadroid.chitchat
+package me.sinhadroid.chitchat;
 
-import android.os.Bundle
+import android.os.Bundle;
 
-import io.flutter.app.FlutterActivity
-import io.flutter.plugins.GeneratedPluginRegistrant
+import io.flutter.app.FlutterActivity;
+import io.flutter.plugins.GeneratedPluginRegistrant;
 
 public class MainActivity extends FlutterActivity { 
   @Override 

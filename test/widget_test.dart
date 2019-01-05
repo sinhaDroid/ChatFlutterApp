@@ -7,12 +7,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:chit_chat/main.dart';
+import 'package:chit_chat_app/login.dart';
 
 void main() {
   testWidgets('Counter increments smoke test', (WidgetTester tester) async {
     // Build our app and trigger a frame.
-    await tester.pumpWidget(new ChitChatApp());
+    await tester.pumpWidget(new MyApp());
 
     // Verify that our counter starts at 0.
     expect(find.text('0'), findsOneWidget);

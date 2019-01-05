@@ -1,193 +1,321 @@
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/foundation.dart';
+import 'dart:async';
+import 'dart:io';
+
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:chit_chat_app/chat.dart';
+import 'package:chit_chat_app/const.dart';
+import 'package:chit_chat_app/login.dart';
+import 'package:chit_chat_app/settings.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
-void main() => runApp(new ChitChatApp());
+void main() => runApp(MyApp());
 
-final ThemeData kIOSTheme = new ThemeData(
-  primarySwatch: Colors.orange,
-  primaryColor: Colors.grey[100],
-  primaryColorBrightness: Brightness.light,
-);
+class MainScreen extends StatefulWidget {
+  final String currentUserId;
 
-final ThemeData kDefaultTheme = new ThemeData(
-  primarySwatch: Colors.purple,
-  accentColor: Colors.orangeAccent[400],
-);
+  MainScreen({Key key, @required this.currentUserId}) : super(key: key);
 
-const String _name = "Your Name";
-
-class ChitChatApp extends StatelessWidget {
-  // This widget is the root of your application.
   @override
-  Widget build(BuildContext context) {
-    return new MaterialApp(
-      title: "Chit Chat",
-      theme: defaultTargetPlatform == TargetPlatform.iOS
-          ? kIOSTheme
-          : kDefaultTheme,
-      home: new ChatScreen(),
-    );
-  }
+  State createState() => MainScreenState(currentUserId: currentUserId);
 }
 
-class ChatMessage extends StatelessWidget {
-  ChatMessage({this.text, this.animationController});
+class MainScreenState extends State<MainScreen> {
+  MainScreenState({Key key, @required this.currentUserId});
 
-  final String text;
-  final AnimationController animationController;
+  final String currentUserId;
+
+  bool isLoading = false;
+  List<Choice> choices = const <Choice>[
+    const Choice(title: 'Settings', icon: Icons.settings),
+    const Choice(title: 'Log out', icon: Icons.exit_to_app),
+  ];
+
+  Future<bool> onBackPress() {
+    openDialog();
+    return Future.value(false);
+  }
+
+  Future<Null> openDialog() async {
+    switch (await showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return SimpleDialog(
+            contentPadding:
+                EdgeInsets.only(left: 0.0, right: 0.0, top: 0.0, bottom: 0.0),
+            children: <Widget>[
+              Container(
+                color: themeColor,
+                margin: EdgeInsets.all(0.0),
+                padding: EdgeInsets.only(bottom: 10.0, top: 10.0),
+                height: 100.0,
+                child: Column(
+                  children: <Widget>[
+                    Container(
+                      child: Icon(
+                        Icons.exit_to_app,
+                        size: 30.0,
+                        color: Colors.white,
+                      ),
+                      margin: EdgeInsets.only(bottom: 10.0),
+                    ),
+                    Text(
+                      'Exit app',
+                      style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 18.0,
+                          fontWeight: FontWeight.bold),
+                    ),
+                    Text(
+                      'Are you sure to exit app?',
+                      style: TextStyle(color: Colors.white70, fontSize: 14.0),
+                    ),
+                  ],
+                ),
+              ),
+              SimpleDialogOption(
+                onPressed: () {
+                  Navigator.pop(context, 0);
+                },
+                child: Row(
+                  children: <Widget>[
+                    Container(
+                      child: Icon(
+                        Icons.cancel,
+                        color: primaryColor,
+                      ),
+                      margin: EdgeInsets.only(right: 10.0),
+                    ),
+                    Text(
+                      'CANCEL',
+                      style: TextStyle(
+                          color: primaryColor, fontWeight: FontWeight.bold),
+                    )
+                  ],
+                ),
+              ),
+              SimpleDialogOption(
+                onPressed: () {
+                  Navigator.pop(context, 1);
+                },
+                child: Row(
+                  children: <Widget>[
+                    Container(
+                      child: Icon(
+                        Icons.check_circle,
+                        color: primaryColor,
+                      ),
+                      margin: EdgeInsets.only(right: 10.0),
+                    ),
+                    Text(
+                      'YES',
+                      style: TextStyle(
+                          color: primaryColor, fontWeight: FontWeight.bold),
+                    )
+                  ],
+                ),
+              ),
+            ],
+          );
+        })) {
+      case 0:
+        break;
+      case 1:
+        exit(0);
+        break;
+    }
+  }
+
+  Widget buildItem(BuildContext context, DocumentSnapshot document) {
+    if (document['id'] == currentUserId) {
+      return Container();
+    } else {
+      return Container(
+        child: FlatButton(
+          child: Row(
+            children: <Widget>[
+              Material(
+                child: CachedNetworkImage(
+                  placeholder: Container(
+                    child: CircularProgressIndicator(
+                      strokeWidth: 1.0,
+                      valueColor: AlwaysStoppedAnimation<Color>(themeColor),
+                    ),
+                    width: 50.0,
+                    height: 50.0,
+                    padding: EdgeInsets.all(15.0),
+                  ),
+                  imageUrl: document['photoUrl'],
+                  width: 50.0,
+                  height: 50.0,
+                  fit: BoxFit.cover,
+                ),
+                borderRadius: BorderRadius.all(Radius.circular(25.0)),
+                clipBehavior: Clip.hardEdge,
+              ),
+              Flexible(
+                child: Container(
+                  child: Column(
+                    children: <Widget>[
+                      Container(
+                        child: Text(
+                          'Nickname: ${document['nickname']}',
+                          style: TextStyle(color: primaryColor),
+                        ),
+                        alignment: Alignment.centerLeft,
+                        margin: EdgeInsets.fromLTRB(10.0, 0.0, 0.0, 5.0),
+                      ),
+                      Container(
+                        child: Text(
+                          'About me: ${document['aboutMe'] ?? 'Not available'}',
+                          style: TextStyle(color: primaryColor),
+                        ),
+                        alignment: Alignment.centerLeft,
+                        margin: EdgeInsets.fromLTRB(10.0, 0.0, 0.0, 0.0),
+                      )
+                    ],
+                  ),
+                  margin: EdgeInsets.only(left: 20.0),
+                ),
+              ),
+            ],
+          ),
+          onPressed: () {
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => Chat(
+                          peerId: document.documentID,
+                          peerAvatar: document['photoUrl'],
+                        )));
+          },
+          color: greyColor2,
+          padding: EdgeInsets.fromLTRB(25.0, 10.0, 25.0, 10.0),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
+        ),
+        margin: EdgeInsets.only(bottom: 10.0, left: 5.0, right: 5.0),
+      );
+    }
+  }
+
+  final GoogleSignIn googleSignIn = GoogleSignIn();
+
+  void onItemMenuPress(Choice choice) {
+    if (choice.title == 'Log out') {
+      handleSignOut();
+    } else {
+      Navigator.push(
+          context, MaterialPageRoute(builder: (context) => Settings()));
+    }
+  }
+
+  Future<Null> handleSignOut() async {
+    this.setState(() {
+      isLoading = true;
+    });
+
+    await FirebaseAuth.instance.signOut();
+    await googleSignIn.disconnect();
+    await googleSignIn.signOut();
+
+    this.setState(() {
+      isLoading = false;
+    });
+
+    Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(builder: (context) => MyApp()),
+        (Route<dynamic> route) => false);
+  }
 
   @override
   Widget build(BuildContext context) {
-    return new SizeTransition(
-      sizeFactor: new CurvedAnimation(
-          parent: animationController, curve: Curves.easeOut),
-      axisAlignment: 0.0,
-      child: new Container(
-        margin: const EdgeInsets.symmetric(vertical: 10.0),
-        child: new Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(
+          'MAIN',
+          style: TextStyle(color: primaryColor, fontWeight: FontWeight.bold),
+        ),
+        centerTitle: true,
+        actions: <Widget>[
+          PopupMenuButton<Choice>(
+            onSelected: onItemMenuPress,
+            itemBuilder: (BuildContext context) {
+              return choices.map((Choice choice) {
+                return PopupMenuItem<Choice>(
+                    value: choice,
+                    child: Row(
+                      children: <Widget>[
+                        Icon(
+                          choice.icon,
+                          color: primaryColor,
+                        ),
+                        Container(
+                          width: 10.0,
+                        ),
+                        Text(
+                          choice.title,
+                          style: TextStyle(color: primaryColor),
+                        ),
+                      ],
+                    ));
+              }).toList();
+            },
+          ),
+        ],
+      ),
+      body: WillPopScope(
+        child: Stack(
           children: <Widget>[
-            new Container(
-              margin: const EdgeInsets.only(right: 16.0),
-              child: new CircleAvatar(
-                child: new Text(_name[0]),
+            // List
+            Container(
+              child: StreamBuilder(
+                stream: Firestore.instance.collection('users').snapshots(),
+                builder: (context, snapshot) {
+                  if (!snapshot.hasData) {
+                    return Center(
+                      child: CircularProgressIndicator(
+                        valueColor: AlwaysStoppedAnimation<Color>(themeColor),
+                      ),
+                    );
+                  } else {
+                    return ListView.builder(
+                      padding: EdgeInsets.all(10.0),
+                      itemBuilder: (context, index) =>
+                          buildItem(context, snapshot.data.documents[index]),
+                      itemCount: snapshot.data.documents.length,
+                    );
+                  }
+                },
               ),
             ),
-            new Expanded(
-              child: new Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  new Text(
-                    _name,
-                    style: Theme.of(context).textTheme.subhead,
-                  ),
-                  new Container(
-                    margin: const EdgeInsets.only(top: 5.0),
-                    child: new Text(text),
-                  )
-                ],
-              ),
+
+            // Loading
+            Positioned(
+              child: isLoading
+                  ? Container(
+                      child: Center(
+                        child: CircularProgressIndicator(
+                            valueColor:
+                                AlwaysStoppedAnimation<Color>(themeColor)),
+                      ),
+                      color: Colors.white.withOpacity(0.8),
+                    )
+                  : Container(),
             )
           ],
         ),
+        onWillPop: onBackPress,
       ),
     );
   }
 }
 
-class ChatScreen extends StatefulWidget {
-  @override
-  State createState() => new ChatScreenState();
-}
+class Choice {
+  const Choice({this.title, this.icon});
 
-class ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
-  final List<ChatMessage> _messages = <ChatMessage>[];
-  final TextEditingController _textEditingController =
-      new TextEditingController();
-  bool _isComposing = false;
-
-  Widget _buildTextComposer() {
-    return new IconTheme(
-      data: new IconThemeData(color: Theme.of(context).accentColor),
-      child: new Container(
-          margin: const EdgeInsets.symmetric(horizontal: 8.0),
-          child: new Row(children: <Widget>[
-            new Flexible(
-              child: new TextField(
-                controller: _textEditingController,
-                onChanged: (String text) {
-                  setState(() {
-                    _isComposing = text.length > 0;
-                  });
-                },
-                onSubmitted: _handleSubmitted,
-                decoration:
-                    new InputDecoration.collapsed(hintText: "Send a message"),
-              ),
-            ),
-            new Container(
-                margin: new EdgeInsets.symmetric(horizontal: 4.0),
-                child: Theme.of(context).platform == TargetPlatform.iOS
-                    ? new CupertinoButton(
-                        child: new Text("Send"),
-                        onPressed: _isComposing
-                            ? () =>
-                                _handleSubmitted(_textEditingController.text)
-                            : null,
-                      )
-                    : new IconButton(
-                        icon: new Icon(Icons.send),
-                        onPressed: _isComposing
-                            ? () =>
-                                _handleSubmitted(_textEditingController.text)
-                            : null,
-                      )),
-          ]),
-          decoration: Theme.of(context).platform == TargetPlatform.iOS
-              ? new BoxDecoration(
-                  border:
-                      new Border(top: new BorderSide(color: Colors.grey[200])))
-              : null),
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return new Scaffold(
-      appBar: new AppBar(
-        title: new Text("Chit Chat"),
-        elevation: Theme.of(context).platform == TargetPlatform.iOS ? 0.0 : 4.0,
-      ),
-      body: new Container(
-          child: new Column(
-            children: <Widget>[
-              new Flexible(
-                  child: new ListView.builder(
-                padding: new EdgeInsets.all(8.0),
-                reverse: true,
-                itemBuilder: (_, int index) => _messages[index],
-                itemCount: _messages.length,
-              )),
-              new Divider(height: 1.0),
-              new Container(
-                decoration: new BoxDecoration(
-                  color: Theme.of(context).cardColor,
-                ),
-                child: _buildTextComposer(),
-              )
-            ],
-          ),
-          decoration: Theme.of(context).platform == TargetPlatform.iOS
-              ? new BoxDecoration(
-                  border: new Border(
-                    top: new BorderSide(color: Colors.grey[200]),
-                  ),
-                )
-              : null),
-    );
-  }
-
-  void _handleSubmitted(String value) {
-    _textEditingController.clear();
-    setState(() {
-      _isComposing = false;
-    });
-    ChatMessage chatMessage = new ChatMessage(
-      text: value,
-      animationController: new AnimationController(
-          duration: new Duration(milliseconds: 700), vsync: this),
-    );
-    setState(() {
-      _messages.insert(0, chatMessage);
-    });
-    chatMessage.animationController.forward();
-  }
-
-  @override
-  void dispose() {
-    for (ChatMessage message in _messages)
-      message.animationController.dispose();
-    super.dispose();
-  }
+  final String title;
+  final IconData icon;
 }
