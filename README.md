@@ -1,4 +1,4 @@
-# Chat Demo
+# Chit Chat Demo
 
 ## Description:
 * A chat app made by Flutter and Firebase.
